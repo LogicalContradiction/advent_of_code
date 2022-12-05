@@ -79,7 +79,74 @@ def calc_your_total_score(data):
 		total_score += calc_score_of_round(line)
 	return total_score
 
+def modify_round_for_adjusted_cypher(round):
+	"""Takes the information about the old cypher and generates a new round representation using the new cypher. Used for solution 2.
+	
+	Parameters:
+		round (str): Represents the old round information.
+	
+	Returns:
+		str: New representation of a round based on the updated cypher given."""
+	opp_throw = round[0]
+	round_result = round[2]
+	you_throw = get_your_throw_from_opp_throw_and_round_result(opp_throw, round_result)
+	new_round = f"{opp_throw} {you_throw}"
+	return new_round
+
+def get_your_throw_from_opp_throw_and_round_result(opp_throw, round_result):
+	"""Returns the shape you must throw to get the desired round result.
+	
+	Parameters:
+		opp_throw (str): A single-character string representing what shape the opponent threw.
+		round_result (str): A single-character string representing what the desired round result is.
+	
+	Returns:
+		str: A single-character string representing what shape you must throw to acheive the desired round result."""
+	rock = "X"
+	paper = "Y"
+	scissors = "Z"
+	if opp_throw == "A":		#rock
+		if round_result == "X":		#lose
+			return scissors
+		elif round_result == "Y":	#draw
+			return rock
+		else:						#win
+			return paper
+	elif opp_throw == "B":		#paper
+		if round_result == "X":		#lose
+			return rock
+		elif round_result == "Y":	#draw
+			return paper
+		else:						#win
+			return scissors
+								#scissors
+	if round_result == "X":			#lose
+		return paper
+	elif round_result == "Y":		#draw
+		return scissors
+	return rock						#win
+
+def adjust_data_for_new_cypher(data):
+	"""Takes the data and adjusts it to use the new cypher given.
+	
+	Parameters:
+		data (list): Represents the old round data as a list of strings.
+	
+	Returns:
+		list: New list of strings where each string has been changed to account for the new cypher."""
+	adjusted_data = []
+	for line in data:
+		adjusted_data.append(modify_round_for_adjusted_cypher(line))
+	return adjusted_data
+
 def run_solution_1(filename):
 	data = readInput(filename)
 	total_score = calc_your_total_score(data)
 	print(f"By following the encrypted guide, you will end the tournament with {total_score} points.")
+
+def run_solution_2(filename):
+	data = readInput(filename)
+	adjusted_data = adjust_data_for_new_cypher(data)
+	total_score = calc_your_total_score(adjusted_data)
+	print(f"After adjusting for the new cypher, the guide will allow you to end the tournament with {total_score} points.")
+

@@ -39,3 +39,26 @@ class AoC_2022_Puzzle_2_Tests(unittest.TestCase):
 
 	def test_calc_your_total_score(self):
 		self.assertEqual(solution.calc_your_total_score(self.data), 15)
+
+	def test_get_your_throw_from_opp_throw_and_round_result(self):
+		rock = "X"
+		paper = "Y"
+		scissors = "Z"
+
+																											#opp	res
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("A", "X"), scissors) 		#R		L
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("B", "X"), rock) 			#P		L
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("C", "X"), paper) 			#S		L
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("A", "Y"), rock) 			#R		D
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("B", "Y"), paper) 			#P		D
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("C", "Y"), scissors) 		#S		D
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("A", "Z"), paper) 			#R		W
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("B", "Z"), scissors) 		#P		W
+		self.assertEqual(solution.get_your_throw_from_opp_throw_and_round_result("C", "Z"), rock) 			#S		W
+
+	def test_modify_round_for_adjusted_cypher(self):
+		self.assertEqual(solution.modify_round_for_adjusted_cypher("A Y"), "A X")
+
+	def test_adjust_data_for_new_cypher(self):
+		exp_result = ["A X", "B X", "C X"]
+		self.assertEqual(solution.adjust_data_for_new_cypher(self.data), exp_result)
