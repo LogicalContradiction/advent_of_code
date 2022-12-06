@@ -91,7 +91,47 @@ def get_total_priority_of_dup_items_in_all_rucksacks(data):
 		int: The sum of the priorities of the single duplicate item in each rucksack."""
 	total = 0
 	for rucksack in data:
-		total += get_dup_item_priority_from_rucksack(rucksack)
+		total += get_dup_item_priority_from_rucksack(rucksack.strip())
+	return total
+
+def get_badge_from_3_rucksacks(rucksack1, rucksack2, rucksack3):
+	"""Get the badge from three unsorted rucksacks. The badge is the common element between the three.
+	
+	Parameters:
+		rucksack1 (str): String representing one of the rucksacks. Unsorted.
+		rucksack2 (str): String representing one of the rucksacks. Unsorted.
+		rucksack3 (str): String representing one of the rucksacks. Unsorted.
+		
+	Returns:
+		str: Single-character string containing the representation of this group's badge."""
+	rs_1_sorted = sorted(rucksack1.strip())
+	rs_2_sorted = sorted(rucksack2.strip())
+	rs_3_sorted = sorted(rucksack3.strip())
+	ptr_1 = 0
+	ptr_2 = 0
+	ptr_3 = 0
+	while rs_1_sorted[ptr_1] != rs_2_sorted[ptr_2] or rs_2_sorted[ptr_2] != rs_3_sorted[ptr_3]:
+		max_element = max(rs_1_sorted[ptr_1], rs_2_sorted[ptr_2], rs_3_sorted[ptr_3])
+		if rs_1_sorted[ptr_1] < max_element:
+			ptr_1 += 1
+		if rs_2_sorted[ptr_2] < max_element:
+			ptr_2 += 1
+		if rs_3_sorted[ptr_3] < max_element:
+			ptr_3 += 1
+	return rs_1_sorted[ptr_1]
+
+def get_total_priority_of_all_badges(data):
+	"""Gets the sum of the priority of all the badges from each group.
+	
+	Parameters:
+		data (list<str>): A list of strings that represent each rucksack. Each group of 3 is a single badge group.
+		
+	Returns:
+		int: Sum of all the priorities of the badges."""
+	total = 0
+	for index in range(0, len(data), 3):
+		badge = get_badge_from_3_rucksacks(data[index], data[index+1], data[index+2])
+		total += convert_item_to_priority(badge)
 	return total
 
 
@@ -100,3 +140,7 @@ def run_solution_1(filename):
 	total = get_total_priority_of_dup_items_in_all_rucksacks(data)
 	print(f"The total priority for the single duplicate item in each rucksack is {total}.")
 
+def run_solution_2(filename):
+	data = readInput(filename)
+	total = get_total_priority_of_all_badges(data)
+	print(f"The sum of the priorities of all the badges is {total}.")

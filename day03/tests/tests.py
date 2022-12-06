@@ -45,3 +45,12 @@ class AoC_2022_Puzzle_3_Tests(unittest.TestCase):
 	
 	def test_get_total_priority_of_dup_items_in_all_rucksacks(self):
 		self.assertEqual(solution.get_total_priority_of_dup_items_in_all_rucksacks(self.data), 157)
+
+	def test_get_badge_from_3_rucksacks(self):
+		rucksack1 = "vJrwpWtwJgWrhcsFMMfFFhFp"
+		rucksack2 = "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"
+		rucksack3 = "PmmdzqPrVvPwwTWBwg"
+		self.assertEqual(solution.get_badge_from_3_rucksacks(rucksack1, rucksack2, rucksack3), "r")
+
+	def test_get_total_priority_of_all_badges(self):
+		self.assertEqual(solution.get_total_priority_of_all_badges(self.data), 70)
