@@ -37,3 +37,20 @@ class AoC_2022_Puzzle_4_Tests(unittest.TestCase):
 	def test_count_num_fully_overlapping_sections(self):
 		total = solution.count_num_fully_overlapping_sections(self.data)
 		self.assertEqual(total, 2)
+
+	def test_does_one_range_overlap_other(self):
+		range1 = (5, 7)
+		range2 = (7, 9)
+		range3 = (2, 8)
+		range4 = (3, 7)
+		range5 = (2, 4)
+		range6 = (6, 8)
+		self.assertTrue(solution.does_one_range_overlap_other(range1, range2))	#overlap at 7
+		self.assertTrue(solution.does_one_range_overlap_other(range3, range4))	#one encloses other
+		self.assertFalse(solution.does_one_range_overlap_other(range5, range6)) #no overlap
+		self.assertTrue(solution.does_one_range_overlap_other(range4, range5))
+		self.assertTrue(solution.does_one_range_overlap_other(range5, range4))
+
+	def test_count_num_overlapping_sections(self):
+		total = solution.count_num_overlapping_sections(self.data)
+		self.assertEqual(total, 4)

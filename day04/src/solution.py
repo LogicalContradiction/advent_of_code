@@ -66,8 +66,50 @@ def count_num_fully_overlapping_sections(data):
 			total += 1
 	return total
 
+def does_one_range_overlap_other(range1, range2):
+	"""Tests to see if one range overlaps with the other.
+	
+	Parameters:
+		range1: (int, int): Tuple of ints that represent the start and end of this range.
+		range2: (int, int): Tuple of ints that represent the start and end of this range.
+		
+	Returns:
+		bool: True if one range overlaps the other, False if not."""
+	range1_s, range1_e = range1
+	range2_s, range2_e = range2
+	#test if range 1 starts at or within range 2
+	if range1_s >= range2_s and range1_s <= range2_e:
+		return True
+	#test if range 2 starts at or within range 1
+	if range2_s >= range1_s and range2_s <= range1_e:
+		return True
+	return False
+
+def count_num_overlapping_sections(data):
+	"""Counts the number of pairs of elves where there is any overlap in the sections that are being cleaned.
+	
+	Parameters:
+		data (list<str>): A list of strings representing the spaces each pair of elves is supposed to clean.
+		
+	Returns:
+		int: The number of pairs of elves where one elf is cleaning a section overlapping with the other."""
+	total = 0
+	for elf_pair in data:
+		cleaning_spaces = split_pair_rep(elf_pair.strip())
+		elf1_space = split_cleaning_space_rep(cleaning_spaces[0])
+		elf2_space = split_cleaning_space_rep(cleaning_spaces[1])
+		if does_one_range_enclose_other(elf1_space, elf2_space) or does_one_range_overlap_other(elf1_space, elf2_space):
+			total += 1
+	return total
+	
+
 
 def run_solution_1(filename):
 	data = readInput(filename)
 	total = count_num_fully_overlapping_sections(data)
 	print(f"There are {total} pairs of elves where one elf's section is completely enclosing the other's.")
+
+def run_solution_2(filename):
+	data = readInput(filename)
+	total = count_num_overlapping_sections(data)
+	print(f"There are {total} pairs of elves where one elf's section is overlapping the other's.")
