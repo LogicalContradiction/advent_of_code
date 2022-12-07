@@ -10,7 +10,7 @@ class AoC_2022_Puzzle_3_Tests(unittest.TestCase):
 
 	def setUp(self):
 		filepath = Path(__file__).parent / "test_input.txt"
-		with open(filepath, "r", encoding="utf8") as file:
+		with open(filepath, "r", encoding="utf8", newline=None) as file:
 			self.data = file.readlines()
 
 	def test_divide_rucksack_into_2_compartments(self):

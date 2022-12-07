@@ -4,7 +4,7 @@ from pathlib import Path
 
 def readInput(input_filename):
 	filepath = Path(__file__).parent / input_filename
-	with open(filepath, "r", encoding="utf8") as file:
+	with open(filepath, "r", encoding="utf8", newline=None) as file:
 			data = file.readlines()
 	return data
 
