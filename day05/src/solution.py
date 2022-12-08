@@ -89,7 +89,10 @@ def get_top_crates_message(stacks):
 		str: The top elements of each stack, combined into one string."""
 	result = ""
 	for stack in stacks:
-		crate = stack[-1]
+		if len(stack) == 0:
+			crate = " "
+		else:
+			crate = stack[-1]
 		result = result + crate
 	return result
 
@@ -134,8 +137,62 @@ def do_simulation(data):
 	result = get_top_crates_message(stacks)
 	return result
 
+def process_single_move_keep_order(move, stacks):
+	"""Moves crates from one stack to another. In the case of multiple crates being moved at once, the order is preserved.
+	
+	Paramters:
+		move (int, int, int): A tuple representing a move to be executed.
+		stacks (list<deque<str>>): Represents the current state of the stacks of crates.
+		
+	Returns:
+		list<deque<str>>: The same list as stacks."""
+	source, dest, amount = move
+	#convert stack num to stack index by subtracting 1
+	source_index = source - 1
+	dest_index = dest - 1
+	temp = deque()
+	for crate_index in range(amount):
+		crate = stacks[source_index].pop()
+		temp.appendleft(crate)
+	#now add these items to the destination
+	stacks[dest_index].extend(temp)
+	return stacks
+
+def process_all_moves_keep_order(moves, stacks):
+	"""Moves all the crates in stacks accourding to the moves. Preserves order when moving multiple crates at once.
+	
+	Parameters:
+		moves (int, int, int): Represents the movements of the crates.
+		stacks (list<deque<str>>): Represents the current state of the stacks of crates.
+		
+	Returns:
+		list<duque<str>>: The final state of the stacks. This is the same reference as stacks."""
+	for move in moves:
+		process_single_move_keep_order(move, stacks)
+	return stacks
+
+def do_simulation_preserve_order(data):
+	"""Simulates moving the crates based off of the data. Will preserve order of crates when multiple are moved in a single step.
+	
+	Parameters:
+		data (list<str>): The input data to run this simulation based on.
+		
+	Returns:
+		str: A string containing the crates on top of each stack."""
+	div_point = get_div_point_index_of_data(data)
+	stacks = decode_starting_pos(data[:div_point])
+	moves = decode_all_movements(data[div_point+1:])
+	process_all_moves_keep_order(moves, stacks)
+	result = get_top_crates_message(stacks)
+	return result
+
 
 def run_solution_1(filename):
 	data = readInput(filename)
 	message = do_simulation(data)
 	print(f"You need to give the Elves the message '{message}'.")
+
+def run_solution_2(filename):
+	data = readInput(filename)
+	message = do_simulation_preserve_order(data)
+	print(f"The new message you have to give the Elves is '{message}'.")

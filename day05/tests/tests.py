@@ -61,3 +61,22 @@ class AoC_2022_Puzzle_5_Tests(unittest.TestCase):
 		exp_res = "CMZ"
 		result = solution.do_simulation(self.data)
 		self.assertEqual(exp_res, result)
+
+	def test_process_single_move_keep_order(self):
+		stacks = [deque(["Z", "N", "D"]), deque(["M", "C"]), deque(["P"])]
+		move = (1, 3, 3)
+		exp_res = [deque([]), deque(["M", "C"]), deque(["P", "Z", "N", "D"])]
+		result = solution.process_single_move_keep_order(move, stacks)
+		self.assertEqual(exp_res, result)
+
+	def test_process_all_moves_keep_order(self):
+		stacks = [deque(["Z", "N"]), deque(["M", "C", "D"]), deque(["P"])]
+		moves = [(2,1,1), (1,3,3), (2,1,2), (1,2,1)]
+		exp_res = [deque(["M"]), deque(["C"]), deque(["P", "Z", "N", "D"])]
+		result = solution.process_all_moves_keep_order(moves, stacks)
+		self.assertEqual(exp_res, result)
+
+	def test_do_simulation_preserve_order(self):
+		exp_res = "MCD"
+		result = solution.do_simulation_preserve_order(self.data)
+		self.assertEqual(exp_res, result)
