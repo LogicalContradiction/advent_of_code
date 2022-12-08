@@ -30,3 +30,10 @@ class AoC_2022_Puzzle_6_Tests(unittest.TestCase):
 		length = 4
 		exp_res = 7
 		self.assertEqual(solution.get_marker_index(datastream, length), exp_res)
+
+	def test_get_message_index(self):
+		datastream = "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
+		msg_len = 14
+		exp_res = 19
+		result = solution.get_message_index(datastream, msg_len)
+		self.assertEqual(exp_res, result)

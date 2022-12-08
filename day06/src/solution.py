@@ -53,8 +53,25 @@ def get_first_unique_sequence_index_of_length(datastream, length):
 		ptr_end += 1
 	return -1
 
+def get_message_index(datastream, packet_length):
+	"""Searches the datastream for the message of a given length. The message comes after the start packet.
+	
+	Parameters:
+		datastream (str): String of characters representing the datastream.
+		packet_length (int): The start of packet sequence length.
+	
+	Returns:
+		int: The number of characters from the beginning of the buffer to the end of the message."""
+	num_char_msg = get_first_unique_sequence_index_of_length(datastream, packet_length)
+	return num_char_msg
+
 	
 def run_solution_1(filename):
 	data = readInput(filename)
 	num_char = get_marker_index(data[0].strip(), 4)
 	print(f"The number of characters that need to be read before the first start of packet marker are {num_char} characters.")
+
+def run_solution_2(filename):
+	data = readInput(filename)
+	num_char_msg = get_message_index(data[0].strip(), 14)
+	print(f"The number of characters that need to be read before the message are {num_char_msg} characters.")
