@@ -39,7 +39,7 @@ def process_cd(commands, command_index, max_dir_size, large_files):
 	Parameters:
 		commands (list<str>): List of strings representing the terminal commands and output.
 		command_index (int): The index into the commands list of the current 'cd' command that is being processed.
-		max_dir_size (int): The maximum size of a directory that should be recorded in large_files.
+		max_dir_size (int): The maximum size of a directory that should be recorded in large_files. If -1 is specified, it will save the size of all directories to large_files.
 		large_files (list<int>): List of filesizes that are less than max_dir_size.
 
 	Returns:
@@ -55,7 +55,7 @@ def process_cd(commands, command_index, max_dir_size, large_files):
 		#decrement counter
 		num_dir_remain -= 1
 	#all sub-directories have been processed. Check if this directory qualifies for the large_files
-	if this_dir_sum <= max_dir_size:
+	if this_dir_sum <= max_dir_size or max_dir_size == -1:
 		large_files.append(this_dir_sum)
 	#the next command is '$ cd ..' to leave this directory, so return and skip this command
 	return next_command_index+1, this_dir_sum
@@ -89,10 +89,75 @@ def get_sum_of_dir_less_than_size(commands, max_dir_size):
 		total_sum += dir_size
 	return total_sum
 
+def get_size_of_all_directories(commands):
+	"""Gets the size of all directories.
+	
+	Parameters:
+		commands (list<str>): The terminal output.
+		
+	Returns:
+		list<int>, int: A list of all the sizes of the directories in commands, and the total size of the filesystem in use."""
+	large_files = []
+	command_index = 0
+	next_command, total_size_in_use = process_cd(commands, command_index, -1, large_files)
+	return large_files, total_size_in_use
+
+def calcuate_min_space_to_free_to_run_update(filesys_size, space_needed, used_space):
+	"""Calculates the minimum amount of space needed to be freed to run an update of the given size.
+	
+	Parameters:
+		filesys_size (int): The total size of the file system.
+		space_needed (int): The amount of space needed to run this update.
+		used_space (int): The amount of space that is currently in use.
+		
+	Returns:
+		int: The amount of space needed to be freed to run an update of the given size."""
+	space_free = filesys_size - used_space
+	min_space_to_free = space_needed - space_free
+	return min_space_to_free
+
+def remove_dirs_smaller_than_size(files, min_size):
+	"""Removes the directories that are less than the provided size from files.
+	
+	Parameters:
+		files (list<int>): The sizes of the files we are looking through.
+		min_size (int): The minimum size of directory needed to be kept.
+	
+	Returns:
+		list<int>: A list where every element is greater than or equal to min_size."""
+	larger_files = []
+	for file_size in files:
+		if file_size >= min_size:
+			larger_files.append(file_size)
+	return larger_files
+
+def get_min_dir_size_to_delete_to_update(commands, free_space_needed, filesys_size):
+	"""Gets the minimum size of directory needed to be deleteed to allow the update to run.
+	
+	Parameters:
+		commands (list<str>): The terminal output.
+		free_space_needed (int): The amount of free space that is required for the update to run.
+		filesys_size (int): The total size of the filesystem.
+		
+	Returns:
+		int: The minimum size of the directory that needs to be deleted in order to run the update."""
+	all_dir_sizes, total_size_in_use = get_size_of_all_directories(commands)
+	min_space_need_to_free = calcuate_min_space_to_free_to_run_update(filesys_size, free_space_needed, total_size_in_use)
+	dir_larger_than_needed = remove_dirs_smaller_than_size(all_dir_sizes, min_space_need_to_free)
+	min_dir_size_to_delete = min(dir_larger_than_needed)
+	return min_dir_size_to_delete
+
 	
 def run_solution_1(filename):
 	data = readInput(filename)
 	max_dir_size = 100000
 	total_sum = get_sum_of_dir_less_than_size(data, max_dir_size)
 	print(f"The sum of all directories smaller than {max_dir_size} is {total_sum}.")
+
+def run_solution_2(filename):
+	data = readInput(filename)
+	filesys_size = 70000000
+	free_space_needed = 30000000
+	dir_size_to_delete = get_min_dir_size_to_delete_to_update(data, free_space_needed, filesys_size)
+	print(f"The minimum size of directory to delete to run this update is {dir_size_to_delete}.")
 
