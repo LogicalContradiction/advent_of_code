@@ -40,3 +40,75 @@ class AoC_2022_Puzzle_7_Tests(unittest.TestCase):
 		result = solution.get_num_visible_trees(self.clean_data)
 
 		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_row(self):
+		row = self.clean_data[1]
+		index = 2
+		exp_result = (1, 2)
+		result = solution.get_num_trees_visible_row(row, index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_row_left_edge(self):
+		row = self.clean_data[2]
+		index = 0
+		exp_result = (0, 4)
+		result = solution.get_num_trees_visible_row(row, index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_row_right_edge(self):
+		row = self.clean_data[3]
+		index = 4
+		exp_result = (4, 0)
+		result = solution.get_num_trees_visible_row(row, index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_col(self):
+		col_index = 2
+		tree_to_check_row_index = 1
+		exp_result = (1, 2)
+		result = solution.get_num_trees_visible_col(self.clean_data, col_index, tree_to_check_row_index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_col_top_edge(self):
+		col_index = 3
+		tree_to_check_row_index = 0
+		exp_result = (0, 4)
+		result = solution.get_num_trees_visible_col(self.clean_data, col_index, tree_to_check_row_index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_num_trees_visible_col_bot_edge(self):
+		col_index = 3
+		tree_to_check_row_index = 4
+		exp_result = (4, 0)
+		result = solution.get_num_trees_visible_col(self.clean_data, col_index, tree_to_check_row_index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_calculate_scenic_score(self):
+		left = 1
+		right = 1
+		up = 2
+		down = 2
+		exp_result = 4
+		result = solution.calculate_scenic_score(left, right, up, down)
+
+		self.assertEqual(exp_result, result)
+
+	def test_calculate_scenic_score_of_tree(self):
+		row_index = 3
+		col_index = 2
+		exp_result = 8
+		result = solution.calculate_scenic_score_of_tree(self.clean_data, row_index, col_index)
+
+		self.assertEqual(exp_result, result)
+
+	def test_get_highest_scenic_score(self):
+		exp_result = 8
+		result = solution.get_highest_scenic_score(self.clean_data)
+
+		self.assertEqual(exp_result, result)
