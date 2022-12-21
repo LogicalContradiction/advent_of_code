@@ -4,7 +4,7 @@ from pathlib import Path
 from src import solution
 
 
-class AoC_2022_Puzzle_7_Tests(unittest.TestCase):
+class AoC_2022_Puzzle_8_Tests(unittest.TestCase):
 
 	def setUp(self):
 		filepath = Path(__file__).parent / "test_input.txt"
