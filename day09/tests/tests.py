@@ -27,6 +27,10 @@ class AoC_2022_Puzzle_9_Tests(unittest.TestCase):
 
 		self.tail7 = solution.RopeNode(0, 0)
 
+		filepath_longdata = Path(__file__).parent / "long_test_input.txt"
+		with open(filepath_longdata, "r", encoding="utf8", newline=None) as file:
+			self.long_data = file.readlines()
+
 	def test_is_head_touching_tail(self):
 		not_valid_tail = solution.RopeNode(-1, -1)
 
@@ -181,5 +185,48 @@ class AoC_2022_Puzzle_9_Tests(unittest.TestCase):
 	def test_calculate_num_unique_locations_tail_visits(self):
 		exp_result = 13
 		result = solution.calculate_num_unique_locations_tail_visits(self.data)
+
+		self.assertEqual(exp_result, result)
+
+	def test_process_all_move_sets_long_rope(self):
+		rope = []
+		for i in range(10):
+			rope.append(solution.RopeNode(0, 0))
+		visited = {}
+		exp_head_x = 2
+		exp_head_y = 2
+		exp_tail_x = 0
+		exp_tail_y = 0
+		exp_num_visited = 0
+		solution.process_all_move_sets_long_rope(self.data, rope, visited)
+
+		self.assertEqual(exp_head_x, rope[0].x)
+		self.assertEqual(exp_head_y, rope[0].y)
+		self.assertEqual(exp_tail_x, rope[-1].x)
+		self.assertEqual(exp_tail_y, rope[-1].y)
+		self.assertEqual(len(visited.keys()), exp_num_visited)
+
+	def test_process_all_move_sets_long_rope_long_data(self):
+		rope = []
+		for i in range(10):
+			rope.append(solution.RopeNode(0, 0))
+		visited = {}
+		exp_head_x = -11
+		exp_head_y = 15
+		exp_tail_x = -11
+		exp_tail_y = 6
+		exp_num_visited = 35
+		solution.process_all_move_sets_long_rope(self.long_data, rope, visited)
+
+		self.assertEqual(exp_head_x, rope[0].x)
+		self.assertEqual(exp_head_y, rope[0].y)
+		self.assertEqual(exp_tail_x, rope[-1].x)
+		self.assertEqual(exp_tail_y, rope[-1].y)
+		self.assertEqual(len(visited.keys()), exp_num_visited)
+
+	def test_calculate_num_unique_locations_tail_visits_long_rope(self):
+		exp_result = 36
+		num_nodes = 10
+		result = solution.calculate_num_unique_locations_tail_visits_long_rope(self.long_data, num_nodes)
 
 		self.assertEqual(exp_result, result)

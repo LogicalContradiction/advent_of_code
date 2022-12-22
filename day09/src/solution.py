@@ -125,14 +125,7 @@ def process_move_set(head, tail, visited, direction, num_moves):
 		None"""
 	for counter in range(num_moves):
 		#first move the head
-		if direction == "U":
-			move_rope_node_up(head)
-		elif direction == "D":
-			move_rope_node_down(head)
-		elif direction == "L":
-			move_rope_node_left(head)
-		else:
-			move_rope_node_right(head)
+		move_head(head, direction)
 		#now check the position of the tail
 		if not is_head_touching_tail(head, tail):
 			#head isn't touching tail, so move it
@@ -141,6 +134,25 @@ def process_move_set(head, tail, visited, direction, num_moves):
 			location = tail.get_location()
 			visited[str(location)] = True
 		#we don't need to move the tail, so just exit
+
+def move_head(head, direction):
+	"""Moves the head one unit in the given direction.
+	
+	Parameters:
+		head (RopeNode): The head of this rope node.
+		direction (str): Single character string representing the direction to move.
+		
+	Returns:
+		None"""
+	if direction == "U":
+		move_rope_node_up(head)
+	elif direction == "D":
+		move_rope_node_down(head)
+	elif direction == "L":
+		move_rope_node_left(head)
+	else:
+		move_rope_node_right(head)
+	return
 
 def process_all_move_sets(moves, head, tail, visited):
 	"""Processes all moves and marks visited with the locations that have been visited by the tail.
@@ -176,8 +188,61 @@ def calculate_num_unique_locations_tail_visits(moves):
 	process_all_move_sets(moves, head, tail, visited)
 	return len(visited.keys())
 
+def process_all_move_sets_long_rope(moves, rope, visited):
+	"""Processes all moves and marks visited with the locations that have been visited by the tail.
+	
+	Paramters:
+		moves (list<str>): Represents all of the moves that need to be processed.
+		rope (list<RopeNodes>): Contains all the rope nodes that make up this longer rope. rope[0] is ALWAYS the head.
+		visited (dict): The unique locations that the tail has already visited.
+		
+	Returns:
+		dict: A reference to the unique nodes visited."""
+	for move in moves:
+		split_moves = move.split()
+		direction = split_moves[0]
+		num_moves = int(split_moves[1])
+		for counter in range(num_moves):
+			#move the head first
+			move_head(rope[0], direction)
+			#now check the rest of the nodes, and move them if they are in bad positions
+			for curr_rope_index in range(0, len(rope)-1, 1):
+				curr_head = rope[curr_rope_index]
+				curr_tail = rope[curr_rope_index+1]
+				if not is_head_touching_tail(curr_head, curr_tail):
+					#move the tail
+					move_tail_towards_head(curr_head, curr_tail)
+					#if we moved the end tail, mark it
+					if curr_rope_index+2 == len(rope):
+						location = curr_tail.get_location()
+						visited[str(location)] = True
+	return visited
+
+def calculate_num_unique_locations_tail_visits_long_rope(moves, num_nodes):
+	"""Calculates the number of unique locations the tail of a rope with multiplie nodes will visit given this set of moves.
+	
+	Parameters:
+		moves (list<str>): Represents all of the moves the head will make.
+		num_nodes (int): The number of nodes this rope should have.
+
+	Returns:
+		int: The number of unique locations visted by the tail of a rope if the given set of moves is followed."""
+	rope = []
+	for i in range(num_nodes):
+		rope.append(RopeNode(0, 0))
+	visited = {}
+	#explicitly add origin
+	visited[str(rope[-1].get_location())] = True
+	process_all_move_sets_long_rope(moves, rope, visited)
+	return len(visited.keys())
+
 
 def run_solution_1(filename):
 	moves = readInput(filename)
 	num_locations = calculate_num_unique_locations_tail_visits(moves)
 	print(f"The tail visits {num_locations} positions at least once.")
+
+def run_solution_2(filename):
+	moves = readInput(filename)
+	num_locations = calculate_num_unique_locations_tail_visits_long_rope(moves, 10)
+	print(f"On a rope with 10 knots, the tail visits {num_locations} positions at least once.")
