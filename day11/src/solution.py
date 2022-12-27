@@ -12,7 +12,7 @@ def readInput(input_filename):
 	return data
 
 class Monkey:
-	def __init__(self, init_id, init_items, worry_operator, other_operator, test_divisor, divisor_true, divisor_false):
+	def __init__(self, init_id, init_items, worry_operator, other_operator, test_divisor, divisor_true, divisor_false, mod_decrease_value=1):
 		self.num_inspections = 0
 		self.id = init_id
 		self.items = deque(init_items)
@@ -28,12 +28,13 @@ class Monkey:
 		self.test_divisor = test_divisor
 		self.divisor_true = divisor_true
 		self.divisor_false = divisor_false
+		self.mod_decrease_value = mod_decrease_value
 
-	def inspect(self):
+	def inspect(self, worry_decreasing_factor=3):
 		"""The monkey takes the first item in its list and inspects it, changing the worry value to a new one based on the operation.
 		
 		Parameters:
-			None
+			worry_decreasing_factor (int): The factor your worry is divided by after inspection (default=3).
 		
 		Returns:
 			int: The new worry level of the item, or -1 if the monkey is holding no other items."""
@@ -42,9 +43,15 @@ class Monkey:
 		self.num_inspections += 1
 		worry_value = self.items.popleft()
 		if self.use_worry_as_other_operator:
-			worry_value = math.floor(self.operation(worry_value, worry_value) / 3)
+			worry_value = self.operation(worry_value, worry_value)
+			if worry_decreasing_factor != 1:
+				worry_value = math.floor(worry_value / worry_decreasing_factor)
 		else:
-			worry_value = math.floor(self.operation(worry_value, self.other_operator) / 3)
+			worry_value = self.operation(worry_value, self.other_operator)
+			if worry_decreasing_factor != 1:
+				worry_value = math.floor(worry_value / worry_decreasing_factor)
+		if self.mod_decrease_value != 1:
+			return worry_value % self.mod_decrease_value
 		return worry_value
 
 	def get_monkey_id_to_throw_to(self, worry_level):
@@ -59,29 +66,29 @@ class Monkey:
 			return self.divisor_true
 		return self.divisor_false
 
-	def do_single_item(self):
+	def do_single_item(self, worry_decreasing_factor=3):
 		"""Monkey inspects and throws a single item (the first item in the queue).
 		
 		Parameters:
-			None
+			worry_decreasing_factor (int): The factor your worry is divided by after inspection (default=3).
 		
 		Returns:
 			int, int: The monkey index that this monkey will throw to, and the new worry level of the item, respectively."""
-		new_worry_value = self.inspect()
+		new_worry_value = self.inspect(worry_decreasing_factor)
 		monkey_to_throw_to = self.get_monkey_id_to_throw_to(new_worry_value)
 		return monkey_to_throw_to, new_worry_value
 
-	def do_turn(self):
+	def do_turn(self, worry_decreasing_factor=3):
 		"""This monkey takes a single turn. It inspects and throws all of the items it is currently holding.
 		
 		Parameters:
-			None
+			worry_decreasing_factor (int): The factor your worry is divided by after inspection (default=3).
 		
 		Returns:
 			list<tuple<int,int>>: A list of tuples. Each tuple represents the monkey an item will be thrown to and the new worry level."""
 		result = []
 		while self.items:
-			item_result = self.do_single_item()
+			item_result = self.do_single_item(worry_decreasing_factor)
 			result.append(item_result)
 		return result
 
@@ -142,18 +149,19 @@ def create_all_monkies(monkey_input):
 		all_monkies.append(monkey)
 	return all_monkies
 
-def simulate_rounds(monkies, num_rounds):
+def simulate_rounds(monkies, num_rounds, worry_decreasing_factor=3):
 	"""Simulates the monkies inspecting and throwing items for the specified number of rounds.
 	
 	Parameters:
 		monkies (list<Monkey>): List of monkies that will be inspecting and throwing items.
 		num_rounds (int): The number of rounds the monkies will be inspecting and throwing items for.
+		worry_decreasing_factor (int): The factor your worry is divided by after inspection (default=3).
 		
 	Returns:
 		list<Monkey>: The list of monkies that was provided."""
 	for round_num in range(num_rounds):
 		for monkey in monkies:
-			thrown_items = monkey.do_turn()
+			thrown_items = monkey.do_turn(worry_decreasing_factor)
 			for item_thrown in thrown_items:
 				monkey_thrown_to_id, new_item_worry_value = item_thrown
 				monkey_thrown_to = monkies[monkey_thrown_to_id]
@@ -202,7 +210,24 @@ def run_solution_1(filename):
 	puzzle_input = readInput(filename)
 	monkies = create_all_monkies(puzzle_input)
 	num_rounds = 20
+	worry_decreasing_factor = 3
 	simulate_rounds(monkies, num_rounds)
 	most_active_monkies_inspect = get_most_active_monkies_info(monkies, 2, False)
 	monkey_business = calculate_monkey_business(most_active_monkies_inspect)
-	print(f"The level of monkey business is {monkey_business}.")
+	print(f"The level of monkey business after {num_rounds} rounds and worry decreasing by a factor of {worry_decreasing_factor} is {monkey_business}.")
+
+def run_solution_2(filename):
+	puzzle_input = readInput(filename)
+	monkies = create_all_monkies(puzzle_input)
+	num_rounds = 10000
+	worry_decreasing_factor = 1
+	#use the Chinese remainder theorem to find divisor to decrease the worry to managable amounts
+	mod_value = monkies[0].test_divisor
+	for monkey_index in range(1, len(monkies), 1):
+		mod_value *= monkies[monkey_index].test_divisor
+	for monkey in monkies:
+		monkey.mod_decrease_value = mod_value
+	simulate_rounds(monkies, num_rounds, worry_decreasing_factor)
+	most_active_monkies_inspect = get_most_active_monkies_info(monkies, 2, False)
+	monkey_business = calculate_monkey_business(most_active_monkies_inspect) #* mod_value
+	print(f"The level of monkey business after {num_rounds} rounds and worry decreasing by a factor of {worry_decreasing_factor} is {monkey_business}.")
