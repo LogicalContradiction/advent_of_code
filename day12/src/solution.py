@@ -132,7 +132,7 @@ def calculate_path(elevation_map, start_node, end_node):
 		MapNode: The end node we wanted to visit. Using this node, it is possible to reconstruct the path."""
 	nodes_to_visit = deque()
 	nodes_to_visit.append(start_node)
-	while not end_node.visited:
+	while not end_node.visited and nodes_to_visit:
 		#get current node
 		curr_node = nodes_to_visit.popleft()
 		if curr_node.visited:
@@ -150,11 +150,91 @@ def calculate_path(elevation_map, start_node, end_node):
 		curr_node.visited = True
 	return end_node
 
+def get_all_nodes_of_height(height_map, desired_elevation):
+	"""Gets all the nodes of a desired height from the map.
+	
+	Parameters:
+		height_map (list<MapNode>): The height map.
+		desired_elevation (str): A single-character string representing the elevation we wanted all the nodes of.
+		
+	Returns:
+		list<MapNode>: All of the nodes that have the desired elevation."""
+	result = []
+	for row in height_map:
+		for node in row:
+			if node.elevation == desired_elevation:
+				result.append(node)
+	return result
+
+def reset_map_and_set_new_start(height_map, old_start, new_start):
+	"""Resets the height map and sets a new start node.
+	
+	Parameters:
+		height_map (list<list<MapNode>>): The height map.
+		old_start (MapNode): The old starting node.
+		new_start (MapNode): The new starting node.
+		
+	Returns:
+		list<list<MapNode>>: The newly-reset map."""
+	for row in height_map:
+		for node in row:
+			if node == new_start:
+				node.is_start = True
+				node.cost_to_reach = 0
+			else:
+				node.cost_to_reach = -1
+			if node == old_start:
+				node.is_start = False
+			node.visited = False
+			node.prev_node = None
+	return height_map
+
+def get_shortest_path(height_map, start_node, end_node):
+	"""Gets the shortest path between the start node and the end node.
+	
+	Parameters:
+		height_map <list<list<MapNode>>): The height map.
+		start_node (MapNode): The starting node of the path.
+		end_node (MapNode): The ending node of the path.
+		
+	Returns:
+		int: The sortest distance between the start node and end node."""
+	final_node = calculate_path(height_map, start_node, end_node)
+	num_steps = final_node.cost_to_reach
+	return num_steps
+	
+def get_shortest_path_all_possible_starts(map_data):
+	"""Gets the shorest path from all possible starting points to the endpoint.
+	
+	Parameters:
+		map_data (list<str>): The map data (puzzle input).
+	
+	Returns:
+		int: The distance of the shortest path from a set of starting points to the end point."""
+	height_map, start_node, end_node = create_map(map_data)
+	possible_start_nodes = get_all_nodes_of_height(height_map, "a")
+	shortest_num_steps = get_shortest_path(height_map, start_node, end_node)
+	old_start_node = start_node
+	for new_start_node in possible_start_nodes:
+		if new_start_node == start_node:
+			continue
+		reset_map_and_set_new_start(height_map, old_start_node, new_start_node)
+		num_steps = get_shortest_path(height_map, new_start_node, end_node)
+		old_start_node = new_start_node
+		if num_steps != -1 and num_steps < shortest_num_steps:
+			shortest_num_steps = num_steps
+	return shortest_num_steps
+
 
 def run_solution_1(filename):
 	map_data = readInput(filename)
 	height_map, start_node, end_node = create_map(map_data)
-	result_final_node = calculate_path(height_map, start_node, end_node)
-	num_steps = result_final_node.cost_to_reach
+	num_steps = get_shortest_path(height_map, start_node, end_node)
 	print(f"The fewest steps needed to move from current position to the best signal location are {num_steps} steps.")
+
+def run_solution_2(filename):
+	map_data = readInput(filename)
+	num_steps = get_shortest_path_all_possible_starts(map_data)
+	print(f"Out of all possible starting points, the number of steps needed to walk the shortest path are {num_steps} steps.")
+	
 

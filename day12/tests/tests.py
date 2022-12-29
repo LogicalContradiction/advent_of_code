@@ -94,3 +94,44 @@ class AoC_2022_Puzzle_12_Tests(unittest.TestCase):
 		self.assertEqual(result_node, end_node)
 		self.assertTrue(result_node.visited)
 		self.assertEqual(exp_num_steps, result_node.cost_to_reach)
+
+	def test_get_shortest_path(self):
+		height_map, start_node, end_node = solution.create_map(self.data)
+		exp_result = 31
+		result = solution.get_shortest_path(height_map, start_node, end_node)
+		
+		self.assertEqual(exp_result, result)
+
+	def test_get_all_nodes_of_height(self):
+		height_map, start_node, end_node = solution.create_map(self.data)
+		desired_height = "a"
+		exp_result = [height_map[0][0], height_map[0][1], height_map[1][0], height_map[2][0], height_map[3][0], height_map[4][0]]
+		result = solution.get_all_nodes_of_height(height_map, desired_height)
+
+		self.assertEqual(exp_result, result)
+
+	def test_reset_map_and_set_new_start(self):
+		height_map, start_node, end_node = solution.create_map(self.data)
+		new_start = height_map[2][0]
+		solution.calculate_path(height_map, start_node, end_node)
+		result_map = solution.reset_map_and_set_new_start(height_map, start_node, new_start)
+
+		for row in result_map:
+			for node in row:
+				if node == new_start:
+					self.assertTrue(node.is_start)
+					self.assertEqual(node.cost_to_reach, 0)
+				else:
+					self.assertFalse(node.is_start)
+					self.assertEqual(node.cost_to_reach, -1)
+				if node == end_node:
+					self.assertTrue(node.is_end)
+				self.assertFalse(node.visited)
+				self.assertEqual(node.prev_node, None)
+
+	def test_get_shortest_path_all_possible_starts(self):
+		exp_result = 29
+		result = solution.get_shortest_path_all_possible_starts(self.data)
+
+		self.assertEqual(exp_result, result)
+
