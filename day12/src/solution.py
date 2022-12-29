@@ -198,7 +198,7 @@ def get_shortest_path(height_map, start_node, end_node):
 		end_node (MapNode): The ending node of the path.
 		
 	Returns:
-		int: The sortest distance between the start node and end node."""
+		int: The sortest distance between the start node and end node, or -1 if it's impossible."""
 	final_node = calculate_path(height_map, start_node, end_node)
 	num_steps = final_node.cost_to_reach
 	return num_steps
